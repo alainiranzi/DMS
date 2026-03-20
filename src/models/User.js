@@ -2,10 +2,15 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
   name: String,
-  email: { type: String, unique: true, required: true },
-  password: { type: String, required: true },
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
-}, { timestamps: true });
+  email: { type: String, unique: true },
+  password: String,
+  role: { type: String, default: "user" },
+  isApproved: { type: Boolean, default: false },
 
-export default mongoose.models.User || mongoose.model("User", UserSchema);
+  // reset password fields
+  resetToken: String,
+  resetTokenExpiry: Date,
+});
+
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
+export default User;

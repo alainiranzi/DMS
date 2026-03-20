@@ -1,16 +1,27 @@
-"use client";
-import { useState } from "react";
+"use client"; 
+
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-
+  const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    if (searchParams) {
+      setToken(searchParams.get("token") || "");
+    }
+  }, [searchParams]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) {
+      setMessage("Token is missing or invalid");
+      return;
+    }
+
     const res = await fetch("/api/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
