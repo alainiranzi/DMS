@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,29 +23,29 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.message || "Login failed");
-      } else {
-        router.push("/admin/dashboard");
-      }
-    } catch (err) {
+      if (!res.ok) setError(data.message || "Login failed");
+      else router.push("/admin/dashboard");
+    } catch {
       setError("Something went wrong");
     }
+
     setLoading(false);
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      
       <h1 className="text-4xl font-bold mb-4 text-sky-700">DMS</h1>
+
       <form
         onSubmit={handleLogin}
-        className="bg-white p-8 rounded-2xl shadow-md w-95"
+        className="bg-white p-8 rounded-2xl shadow-md w-96"
       >
-        <h2 className="text-1xl font-bold mb-5 text-center text-black">
-          Welcome Back
-        </h2>
+        
+        <h2 className="text-xl font-bold mb-5 text-center text-black">Welcome Back</h2>
 
         {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
@@ -64,14 +64,13 @@ export default function LoginPage() {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-1">
             <label className="text-sm">Password</label>
-            <a
+            <Link
               href="/forgot-password"
               className="text-sm text-gray-600 hover:text-sky-500 hover:underline"
             >
               Forgot password?
-            </a>
+            </Link>
           </div>
-
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -93,7 +92,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full p-2 rounded text-white transition font-semibold ${
+          className={`w-full p-2 rounded text-white font-semibold transition ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-gradient-to-r from-sky-600 to-sky-800 hover:from-sky-500 hover:to-sky-700"
