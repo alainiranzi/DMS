@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { postData } from "@/lib/api";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
@@ -18,9 +19,7 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (searchParams) {
-      setToken(searchParams.get("token") || "");
-    }
+    if (searchParams) setToken(searchParams.get("token") || "");
   }, [searchParams]);
 
   const handleSubmit = async (e) => {
@@ -40,38 +39,24 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Something went wrong");
-      } else {
-        setMessage("Password reset successfully! Redirecting...");
-        setTimeout(() => router.push("/"), 2000);
-      }
-    } catch {
-      setError("Something went wrong");
+      await postData("/api/reset-password", { token, password });
+      setMessage("Password reset successfully! Redirecting...");
+      setTimeout(() => router.push("/"), 2000);
+    } catch (err) {
+      setError(err.message);
     }
     setLoading(false);
   };
 
   return (
     <>
-      
       {!message && (
         <h2 className="text-1xl font-bold mb-5 text-center text-black-700">
           Reset Password
         </h2>
       )}
-
       {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-      {message && (
-        <p className="text-black-700 text-sm mb-4 text-center">{message}</p>
-      )}
+      {message && <p className="text-black-700 text-sm mb-4 text-center">{message}</p>}
 
       {!message && (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

@@ -7,6 +7,7 @@ export async function POST(req) {
   const { email } = await req.json();
   await connectDB();
 
+  // Reba user
   const user = await User.findOne({ email });
   if (!user) {
     return new Response(
@@ -15,16 +16,16 @@ export async function POST(req) {
     );
   }
 
-  // Generate reset token (1 hour expiry)
+  // Generate token (1 hour expiry)
   const token = crypto.randomBytes(32).toString("hex");
   user.resetToken = token;
   user.resetTokenExpiry = Date.now() + 3600000;
   await user.save();
 
-  const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${token}`;
-
   try {
-    await sendResetEmail(email, resetLink);
+    // Twohereze token nyayo muri sendResetEmail
+    await sendResetEmail(email, token);
+
     return new Response(
       JSON.stringify({ success: true, message: "Reset email sent" }),
       { status: 200 }

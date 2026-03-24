@@ -10,11 +10,11 @@ export default async function createAdmin() {
     return null;
   }
 
-  // Reba niba hari admin ihari
+  
   const existingAdmin = await User.findOne({ role: "admin" });
 
   if (existingAdmin) {
-    // Update email na password
+    
     existingAdmin.email = adminEmail;
     existingAdmin.password = await hashPassword(adminPassword);
     await existingAdmin.save();

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { postData } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,18 +19,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) setError(data.message || "Login failed");
-      else router.push("/admin/dashboard");
-    } catch {
-      setError("Something went wrong");
+      await postData("/api/login", { email, password });
+      router.push("/admin/dashboard");
+    } catch (err) {
+      setError(err.message);
     }
 
     setLoading(false);
@@ -37,14 +30,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      
       <h1 className="text-4xl font-bold mb-4 text-sky-700">DMS</h1>
 
       <form
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-2xl shadow-md w-96"
       >
-        
         <h2 className="text-xl font-bold mb-5 text-center text-black">Welcome Back</h2>
 
         {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}

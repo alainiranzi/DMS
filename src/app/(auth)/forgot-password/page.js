@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { postData } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -15,20 +16,10 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Something went wrong");
-      } else {
-        setMessage("We sent a reset link to your email");
-      }
-    } catch {
-      setError("Something went wrong");
+      await postData("/api/forgot-password", { email });
+      setMessage("We sent a reset link to your email");
+    } catch (err) {
+      setError(err.message);
     }
 
     setLoading(false);
@@ -36,22 +27,17 @@ export default function ForgotPasswordPage() {
 
   return (
     <>
-    
       {!message && (
         <h2 className="text-1xl font-bold mb-5 text-center text-black-700">
           Forgot Password
         </h2>
       )}
-
       {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-      {message && (
-        <p className="text-black-700 text-sm mb-4 text-center">{message}</p>
-      )}
+      {message && <p className="text-black-700 text-sm mb-4 text-center">{message}</p>}
 
       {!message && (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-           
             <input
               type="email"
               placeholder="Enter your email"
@@ -61,7 +47,6 @@ export default function ForgotPasswordPage() {
               required
             />
           </div>
-
           <button
             type="submit"
             disabled={loading}
