@@ -1,105 +1,120 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { postData } from "@/lib/api";
+import { useState } from "react";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
+  const params = useSearchParams();
   const router = useRouter();
+  const token = params.get("token");
 
-  const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (searchParams) setToken(searchParams.get("token") || "");
-  }, [searchParams]);
-
-  const handleSubmit = async (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    setMessage("");
     setError("");
+    setMessage("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    if (!token) {
-      setError("Token is missing or invalid");
-      return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setMessage("Password updated successfully");
+        setTimeout(() => router.push("/"), 2000);
+      } else {
+        setError(data.message);
+      }
+    } catch {
+      setError("Something went wrong");
     }
 
-    setLoading(true);
-    try {
-      await postData("/api/reset-password", { token, password });
-      setMessage("Password reset successfully! Redirecting...");
-      setTimeout(() => router.push("/"), 2000);
-    } catch (err) {
-      setError(err.message);
-    }
     setLoading(false);
   };
 
   return (
     <>
-      {!message && (
-        <h2 className="text-1xl font-bold mb-5 text-center text-black-700">
-          Reset Password
-        </h2>
+      <h2 className="text-xl font-bold mb-5 text-center text-black">
+        Reset Password
+      </h2>
+
+      {error && (
+        <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
       )}
-      {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-      {message && <p className="text-black-700 text-sm mb-4 text-center">{message}</p>}
+
+      {message && (
+        <p className="text-green-600 text-sm mb-4 text-center">{message}</p>
+      )}
 
       {!message && (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
+        <form onSubmit={handleReset}>
+          
+          <div className="mb-4">
             <label className="block mb-1 text-sm">New Password</label>
+
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter new password"
+                placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 border rounded pr-10 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                className="w-full p-2 border rounded pr-10 focus:outline-none focus:ring-2 focus:ring-sky-400"
                 required
               />
+
               <span
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
               >
-                {showPassword ? "👁️" : "👁️"}
+                👁️
               </span>
             </div>
           </div>
 
-          <div>
+          
+          <div className="mb-6">
             <label className="block mb-1 text-sm">Confirm Password</label>
+
             <div className="relative">
               <input
                 type={showConfirm ? "text" : "password"}
-                placeholder="Confirm new password"
+                placeholder="********"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-2 border rounded pr-10 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                className="w-full p-2 border rounded pr-10 focus:outline-none focus:ring-2 focus:ring-sky-400"
                 required
               />
+
               <span
                 onClick={() => setShowConfirm(!showConfirm)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
               >
-                {showConfirm ? "👁️" : "👁️"}
+                👁️
               </span>
             </div>
           </div>
 
+         
           <button
             type="submit"
             disabled={loading}
@@ -109,7 +124,7 @@ export default function ResetPasswordPage() {
                 : "bg-gradient-to-r from-sky-600 to-sky-800 hover:from-sky-500 hover:to-sky-700"
             }`}
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            {loading ? "Updating..." : "Update Password"}
           </button>
         </form>
       )}

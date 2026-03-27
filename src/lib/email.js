@@ -1,29 +1,51 @@
-import { MailerSend } from "mailersend";
+import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 
 const mailerSend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY,
 });
 
-export const sendResetEmail = async (toEmail, token) => {
-  try {
-    if (!token) throw new Error("Missing reset token");
+const sentFrom = new Sender(
+  process.env.EMAIL_FROM,
+  process.env.EMAIL_FROM_NAME
+);
 
-  
-    const baseUrl = (process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "");
-    const resetLink = `${baseUrl}/reset-password?token=${token}`;
 
-    await mailerSend.email.send({
-      from: { email: process.env.EMAIL_FROM, name: process.env.EMAIL_FROM_NAME },
-      to: [{ email: toEmail }],
-      subject: "Reset your password",
-      html: `<p>Hello,</p>
-             <p>Click the link below to reset your password:</p>
-             <a href="${resetLink}">Reset Password</a>`,
-    });
+export async function sendCredentialsEmail({
+  to,
+  first_name,
+  password,
+  resetLink,
+}) {
+  const recipients = [new Recipient(to)];
 
-    console.log("Reset email sent to", toEmail, "->", resetLink);
-  } catch (err) {
-    console.error("Error sending reset email:", err.response?.data || err);
-    throw new Error("Failed to send reset email");
-  }
-};
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo(recipients)
+    .setSubject("Your Account Details")
+    .setHtml(`
+      <h2>Welcome ${first_name}</h2>
+      <p>Your account has been created.</p>
+      <p><b>Password:</b> ${password}</p>
+      <p>Change your password:</p>
+      <a href="${resetLink}">${resetLink}</a>
+    `);
+
+  await mailerSend.email.send(emailParams);
+}
+
+
+export async function sendResetEmail({ to, resetLink }) {
+  const recipients = [new Recipient(to)];
+
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo(recipients)
+    .setSubject("Reset Password")
+    .setHtml(`
+      <h2>Password Reset</h2>
+      <p>Click below to reset:</p>
+      <a href="${resetLink}">${resetLink}</a>
+    `);
+
+  await mailerSend.email.send(emailParams);
+}

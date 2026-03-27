@@ -1,4 +1,4 @@
-// src/lib/api.js
+
 export async function postData(url, data) {
   const res = await fetch(url, {
     method: "POST",
