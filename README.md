@@ -94,7 +94,7 @@ http://localhost:3000/api/seed-super-admin
 
 ---
 
-## 🔐 Roles & Permissions
+##  Roles & Permissions
 
 | Role        | Permissions                               |
 | ----------- | ----------------------------------------- |
@@ -143,7 +143,7 @@ Pull requests are welcome. For major changes, please open an issue first.
 
 ## 👨‍💻 Author
 
-**Alain Irani**
+**Alain Iranzi**
  [alainiranzi@gmail.com](mailto:alainiranzi@gmail.com)
 
 ---
