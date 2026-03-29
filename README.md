@@ -30,7 +30,6 @@ This system provides role-based access for **Super Admin** and **Admin**, with s
 * **Styling:** Tailwind CSS
 * **Notifications:** React Hot Toast
 
----
 
 
 ---
