@@ -143,7 +143,7 @@ Pull requests are welcome. For major changes, please open an issue first.
 ## 👨‍💻 Author
 
 **Alain Iranzi**
- [alainiranzi@gmail.com](mailto:alainiranzi@gmail.com)
+ [alainiranzi00@gmail.com](mailto:alainiranzi00@gmail.com)
 
 ---
 
